@@ -13,6 +13,7 @@ const FORKED_REPOS = gql`
           cursor
           node {
             nameWithOwner
+            name
             isFork
             url
             updatedAt
@@ -30,6 +31,16 @@ const FORKED_REPOS = gql`
   }
 `;
 
+function deleteRepo(repo) {
+  console.log(repo);
+  return fetch('https://api.github.com/repos/chrissygonzalez/' + repo, {
+    method: 'delete',
+    headers: {
+      authorization: `token ${process.env.REACT_APP_GITHUB_KEY}`,
+    },
+  }).then((response) => console.log(response));
+}
+
 const Repo = ({ repo }) => {
   const lastUpdated = new Date(repo.node.updatedAt).toDateString();
   return (
@@ -43,7 +54,9 @@ const Repo = ({ repo }) => {
         <a href={repo.node.parent.url}>{repo.node.parent.nameWithOwner}</a> by{' '}
         {repo.node.parent.owner.login}
       </p>
-      <button onClick={() => alert('deleting!')}>Delete forked repo</button>
+      <button onClick={() => deleteRepo(repo.node.name)}>
+        Delete forked repo
+      </button>
     </li>
   );
 };
