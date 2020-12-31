@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import './App.css';
+import RepoList from './components/RepoList';
 
-const FORKED_REPOS = gql`
-  query FORKED_REPOS($login: String!) {
+const REPOS = gql`
+  query REPOS($login: String!) {
     user(login: $login) {
       name
       websiteUrl
-      repositories(first: 10, orderBy: { field: NAME, direction: DESC }) {
+      repositories(first: 100, orderBy: { field: UPDATED_AT, direction: ASC }) {
         edges {
           cursor
           node {
             nameWithOwner
             name
-            isFork
+            isFork @include(if: true)
             url
             updatedAt
             parent {
@@ -31,52 +32,48 @@ const FORKED_REPOS = gql`
   }
 `;
 
-function deleteRepo(repo) {
-  console.log(repo);
-  return fetch('https://api.github.com/repos/chrissygonzalez/' + repo, {
-    method: 'delete',
-    headers: {
-      authorization: `token ${process.env.REACT_APP_GITHUB_KEY}`,
-    },
-  }).then((response) => console.log(response));
-}
-
-const Repo = ({ repo }) => {
-  const lastUpdated = new Date(repo.node.updatedAt).toDateString();
-  return (
-    <li key={repo.cursor}>
-      <a href={repo.node.url} className="bold">
-        {repo.node.nameWithOwner}
-      </a>
-      <p className="small">Last updated {lastUpdated}</p>
-      <p className="small">
-        Forked from{' '}
-        <a href={repo.node.parent.url}>{repo.node.parent.nameWithOwner}</a> by{' '}
-        {repo.node.parent.owner.login}
-      </p>
-      <button onClick={() => deleteRepo(repo.node.name)}>
-        Delete forked repo
-      </button>
-    </li>
-  );
-};
-
 function App() {
-  const { loading, error, data } = useQuery(FORKED_REPOS, {
+  const [showAllRepos, setShowAllRepos] = useState(true);
+  const { loading, error, refetch, data } = useQuery(REPOS, {
     variables: { login: 'chrissygonzalez' },
   });
   if (error) return { error };
   if (loading) return <h1>Loading...</h1>;
-  const forkedRepos = data.user.repositories.edges;
-
+  const allRepos = data.user.repositories.edges;
+  const forkedRepos = allRepos.filter((repo) => repo.node.isFork === true);
+  const reposToShow = showAllRepos ? allRepos : forkedRepos;
   return (
-    <main className="App">
-      <ul>
-        {forkedRepos.map((repo) => {
-          return <Repo repo={repo} />;
-        })}
-      </ul>
-    </main>
+    <>
+      <header>
+        GitHub Repo Manager
+        <button
+          className={showAllRepos ? 'toggle selected' : 'toggle'}
+          onClick={() => setShowAllRepos(true)}>
+          All Repos
+        </button>
+        <button
+          className={showAllRepos ? 'toggle' : 'toggle selected'}
+          onClick={() => setShowAllRepos(false)}>
+          Forked Repos
+        </button>
+        <label for="repo-name">Create new repo</label>
+        <input
+          type="text"
+          name="repo-name"
+          id="repo-name"
+          placeholder="Repository name"
+        />
+        <select name="visibility" id="visibility-select">
+          <option value="">Choose a visibility level</option>
+          <option value="PRIVATE">Private</option>
+          <option value="PUBLIC">Public</option>
+          <option value="INTERNAL">Internal</option>
+        </select>
+      </header>
+      <main className="App">
+        <RepoList data={reposToShow} refetch={refetch} />
+      </main>
+    </>
   );
 }
 
