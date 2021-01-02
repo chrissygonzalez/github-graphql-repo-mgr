@@ -5,7 +5,7 @@ const RepoList = ({ data, refetch }) => {
   return (
     <ul>
       {data.map((repo) => {
-        return <Repo repo={repo} refetch={refetch} />;
+        return <Repo repo={repo} refetch={refetch} key={repo.cursor} />;
       })}
     </ul>
   );

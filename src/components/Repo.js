@@ -16,7 +16,7 @@ const Repo = ({ repo, refetch }) => {
   };
 
   return (
-    <li key={repo.cursor}>
+    <li>
       {isFork && (
         <div className="flex">
           <ForkIcon />
