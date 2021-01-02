@@ -1,7 +1,7 @@
 import React from 'react';
 import ForkIcon from './ForkIcon';
 
-const Repo = ({ repo, refetch }) => {
+const Repo = ({ repo, refetch, showAllDelete }) => {
   const lastUpdated = new Date(repo.node.updatedAt).toDateString();
   const isFork = repo.node.isFork;
   const deleteRepo = (repo) => {
@@ -41,6 +41,11 @@ const Repo = ({ repo, refetch }) => {
         {isFork && (
           <button onClick={() => deleteRepo(repo.node.name)}>
             Delete forked repo
+          </button>
+        )}
+        {!isFork && showAllDelete && (
+          <button onClick={() => deleteRepo(repo.node.name)}>
+            Delete repo
           </button>
         )}
       </div>

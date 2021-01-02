@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 import './App.css';
 import RepoList from './components/RepoList';
+import RepoSort from './components/RepoSort';
 import CreateRepoForm from './components/CreateRepoForm';
 import { GET_REPOS } from './graphql/queries';
 
 function App() {
   const [showAllRepos, setShowAllRepos] = useState(true);
   const [direction, setDirection] = useState('ASC');
+  const [showAllDelete, setShowAllDelete] = useState(false);
   const { loading, error, refetch, data } = useQuery(GET_REPOS, {
     variables: { login: 'chrissygonzalez', direction },
   });
@@ -20,6 +22,9 @@ function App() {
   const handleDirectionChange = (e) => {
     setDirection(e.target.value);
     refetch();
+  };
+  const handleCheck = (e) => {
+    setShowAllDelete(e.target.checked);
   };
 
   return (
@@ -41,15 +46,20 @@ function App() {
         <CreateRepoForm />
       </header>
       <main>
-        <select
-          name="direction"
-          id="direction"
-          className="direction"
-          onChange={handleDirectionChange}>
-          <option value="ASC">Oldest first</option>
-          <option value="DESC">Newest first</option>
-        </select>
-        <RepoList data={reposToShow} refetch={refetch} />
+        <RepoSort onChange={handleDirectionChange} />
+        <label>
+          <input
+            type="checkbox"
+            checked={showAllDelete}
+            onChange={handleCheck}
+          />
+          Show delete button for all repos
+        </label>
+        <RepoList
+          data={reposToShow}
+          refetch={refetch}
+          showAllDelete={showAllDelete}
+        />
       </main>
     </>
   );

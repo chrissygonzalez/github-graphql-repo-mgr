@@ -37,6 +37,7 @@ select {
   border-radius: 4px;
   margin-right: 10px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .submit {
@@ -56,7 +57,11 @@ select {
 
 .direction {
   border: none;
-  background-color: #eee;
+  background-color: #fff;
+}
+
+.direction:hover {
+  background-color: #fff;
 }
 
 header {
@@ -76,13 +81,16 @@ a:active {
   color: #0a7e9d;
 }
 
+main {
+  max-width: 1000px;
+  margin: 20px auto;
+}
+
 ul {
   display: flex;
   flex-direction: column;
   flex-shrink: 1;
   list-style: none;
-  max-width: 1000px;
-  margin: 20px auto;
   border-radius: 8px;
   border: 1px solid #ccc;
   background-color: #fff;
