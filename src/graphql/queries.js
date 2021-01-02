@@ -11,7 +11,7 @@ export const GET_REPOS = gql`
           node {
             nameWithOwner
             name
-            isFork @include(if: true)
+            isFork
             url
             updatedAt
             parent {
