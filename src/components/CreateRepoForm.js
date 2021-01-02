@@ -8,7 +8,7 @@ const CreateRepoForm = () => {
     repoVisibility: '',
   };
   const [repoValues, setRepoValues] = useState(initialState);
-  const [createRepo, { data }] = useMutation(CREATE_REPO);
+  const [createRepo] = useMutation(CREATE_REPO);
   const handleSubmit = (e) => {
     e.preventDefault();
     createRepo({
@@ -19,11 +19,8 @@ const CreateRepoForm = () => {
     });
     setRepoValues(initialState);
   };
-  const handleNameChange = (e) => {
-    setRepoValues({ ...repoValues, repoName: e.target.value });
-  };
-  const handleVisibilityChange = (e) => {
-    setRepoValues({ ...repoValues, repoVisibility: e.target.value });
+  const handleChange = (e) => {
+    setRepoValues({ ...repoValues, [e.target.id]: e.target.value });
   };
   return (
     <div>
@@ -31,15 +28,12 @@ const CreateRepoForm = () => {
       <input
         type="text"
         name="repo-name"
-        id="repo-name"
+        id="repoName"
         placeholder="Repository name"
         value={repoValues.repoName}
-        onChange={handleNameChange}
+        onChange={handleChange}
       />
-      <select
-        name="visibility"
-        id="visibility-select"
-        onChange={handleVisibilityChange}>
+      <select name="visibility" id="repoVisibility" onChange={handleChange}>
         <option value="">Repo visibility</option>
         <option value="PRIVATE">Private</option>
         <option value="PUBLIC">Public</option>

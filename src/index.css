@@ -54,6 +54,11 @@ select {
   border: 1px solid #fff;
 }
 
+.direction {
+  border: none;
+  background-color: #eee;
+}
+
 header {
   background-color: #000;
   color: #fff;
