@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/react-hooks';
 import './App.css';
 import RepoList from './components/RepoList';
 import RepoSort from './components/RepoSort';
+import RepoButton from './components/RepoButton';
 import CreateRepoForm from './components/CreateRepoForm';
 import { GET_REPOS } from './graphql/queries';
 
@@ -10,8 +11,9 @@ function App() {
   const [showAllRepos, setShowAllRepos] = useState(true);
   const [direction, setDirection] = useState('ASC');
   const [showAllDelete, setShowAllDelete] = useState(false);
+  const username = process.env.REACT_APP_GITHUB_USER;
   const { loading, error, refetch, data } = useQuery(GET_REPOS, {
-    variables: { login: 'chrissygonzalez', direction },
+    variables: { login: username, direction },
   });
   if (error) return { error };
   if (loading) return <h1>Loading...</h1>;
@@ -26,22 +28,25 @@ function App() {
   const handleCheck = (e) => {
     setShowAllDelete(e.target.checked);
   };
+  const handleButtonClick = () => {
+    setShowAllRepos(!showAllRepos);
+  };
 
   return (
     <>
       <header className="flex space-between">
         <div>
           GitHub Repo Manager
-          <button
-            className={showAllRepos ? 'toggle selected' : 'toggle'}
-            onClick={() => setShowAllRepos(true)}>
-            All Repos
-          </button>
-          <button
-            className={showAllRepos ? 'toggle' : 'toggle selected'}
-            onClick={() => setShowAllRepos(false)}>
-            Forked Repos
-          </button>
+          <RepoButton
+            condition={showAllRepos}
+            handleClick={handleButtonClick}
+            text="All Repos"
+          />
+          <RepoButton
+            condition={!showAllRepos}
+            handleClick={handleButtonClick}
+            text="Forked Repos"
+          />
         </div>
         <CreateRepoForm />
       </header>
