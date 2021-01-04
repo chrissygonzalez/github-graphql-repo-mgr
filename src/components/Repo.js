@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ForkIcon from './ForkIcon';
 
 const Repo = ({ repo, refetch, showAllDelete }) => {
+  const [repoDeleted, setRepoDeleted] = useState(false);
   const lastUpdated = new Date(repo.node.updatedAt).toDateString();
   const isFork = repo.node.isFork;
+  const handleDelete = (repo) => {
+    setRepoDeleted(true);
+    deleteRepo(repo);
+  };
   const deleteRepo = (repo) => {
     return fetch('https://api.github.com/repos/chrissygonzalez/' + repo, {
       method: 'delete',
@@ -15,6 +20,10 @@ const Repo = ({ repo, refetch, showAllDelete }) => {
     });
   };
 
+  const repoClasses = repoDeleted
+    ? 'repo-content  repo-deleted'
+    : 'repo-content';
+
   return (
     <li>
       {isFork && (
@@ -22,7 +31,7 @@ const Repo = ({ repo, refetch, showAllDelete }) => {
           <ForkIcon />
         </div>
       )}
-      <div className="repo-content">
+      <div className={repoClasses}>
         <div>
           <a href={repo.node.url} className="bold">
             {repo.node.nameWithOwner}
@@ -44,7 +53,7 @@ const Repo = ({ repo, refetch, showAllDelete }) => {
           </button>
         )}
         {!isFork && showAllDelete && (
-          <button onClick={() => deleteRepo(repo.node.name)}>
+          <button onClick={() => handleDelete(repo.node.name)}>
             Delete repo
           </button>
         )}

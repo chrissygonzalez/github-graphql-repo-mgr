@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/react-hooks';
 import { CREATE_REPO } from '../graphql/mutations';
+import { GET_REPOS } from '../graphql/queries';
 
-const CreateRepoForm = () => {
+const CreateRepoForm = ({ direction }) => {
+  const username = process.env.REACT_APP_GITHUB_USER;
   const initialState = {
     repoName: '',
-    repoVisibility: '',
+    repoVisibility: 'PUBLIC',
   };
   const [repoValues, setRepoValues] = useState(initialState);
-  const [createRepo] = useMutation(CREATE_REPO);
+  const [createRepo, { data, error }] = useMutation(CREATE_REPO, {
+    refetchQueries: [
+      { query: GET_REPOS, variables: { login: username, direction } },
+    ],
+  });
   const handleSubmit = (e) => {
     e.preventDefault();
     createRepo({
@@ -34,9 +40,8 @@ const CreateRepoForm = () => {
         onChange={handleChange}
       />
       <select name="visibility" id="repoVisibility" onChange={handleChange}>
-        <option value="">Repo visibility</option>
-        <option value="PRIVATE">Private</option>
         <option value="PUBLIC">Public</option>
+        <option value="PRIVATE">Private</option>
         <option value="INTERNAL">Internal</option>
       </select>
       <button type="submit" className="submit" onClick={handleSubmit}>
